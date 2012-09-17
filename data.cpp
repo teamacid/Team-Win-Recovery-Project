@@ -551,6 +551,11 @@ void DataManager::SetDefaultValues()
 	mConstValues.insert(make_pair(TW_HAS_CRYPTO, "1"));
 	LOGI("Device has crypto support compiled into recovery.\n");
 #endif
+#ifdef TW_SDEXT_NO_EXT4
+	mConstValues.insert(make_pair(TW_SDEXT_DISABLE_EXT4, "1"));
+#else
+	mConstValues.insert(make_pair(TW_SDEXT_DISABLE_EXT4, "0"));
+#endif
 
     mConstValues.insert(make_pair(TW_MIN_SYSTEM_VAR, TW_MIN_SYSTEM_SIZE));
 	mValues.insert(make_pair(TW_BACKUP_NAME, make_pair("(Current Date)", 0)));
@@ -618,7 +623,6 @@ void DataManager::SetDefaultValues()
 	mValues.insert(make_pair("tw_terminal_state", make_pair("0", 0)));
 	mValues.insert(make_pair("tw_background_thread_running", make_pair("0", 0)));
 	mValues.insert(make_pair(TW_RESTORE_FILE_DATE, make_pair("0", 0)));
-	mValues.insert(make_pair(TW_SHIFT_KEY, make_pair("0", 0)));
 }
 
 // Magic Values

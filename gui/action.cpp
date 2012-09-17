@@ -137,314 +137,8 @@ int GUIAction::NotifyTouch(TOUCH_STATE state, int x, int y)
 
 int GUIAction::NotifyKey(int key)
 {
-	if (!mKey || key != mKey) {
-		int keyboard = -1, shiftkey = 0;
-
-		DataManager::GetValue(TW_SHIFT_KEY, shiftkey);
-
-		switch (key) {
-			case KEY_A:
-				if (shiftkey)
-					keyboard = 'A';
-				else
-					keyboard = 'a';
-				break;
-			case KEY_B:
-				if (shiftkey)
-					keyboard = 'B';
-				else
-					keyboard = 'b';
-				break;
-			case KEY_C:
-				if (shiftkey)
-					keyboard = 'C';
-				else
-					keyboard = 'c';
-				break;
-			case KEY_D:
-				if (shiftkey)
-					keyboard = 'D';
-				else
-					keyboard = 'd';
-				break;
-			case KEY_E:
-				if (shiftkey)
-					keyboard = 'E';
-				else
-					keyboard = 'e';
-				break;
-			case KEY_F:
-				if (shiftkey)
-					keyboard = 'F';
-				else
-					keyboard = 'f';
-				break;
-			case KEY_G:
-				if (shiftkey)
-					keyboard = 'G';
-				else
-					keyboard = 'g';
-				break;
-			case KEY_H:
-				if (shiftkey)
-					keyboard = 'H';
-				else
-					keyboard = 'h';
-				break;
-			case KEY_I:
-				if (shiftkey)
-					keyboard = 'I';
-				else
-					keyboard = 'i';
-				break;
-			case KEY_J:
-				if (shiftkey)
-					keyboard = 'J';
-				else
-					keyboard = 'j';
-				break;
-			case KEY_K:
-				if (shiftkey)
-					keyboard = 'K';
-				else
-					keyboard = 'k';
-				break;
-			case KEY_L:
-				if (shiftkey)
-					keyboard = 'L';
-				else
-					keyboard = 'l';
-				break;
-			case KEY_M:
-				if (shiftkey)
-					keyboard = 'M';
-				else
-					keyboard = 'm';
-				break;
-			case KEY_N:
-				if (shiftkey)
-					keyboard = 'N';
-				else
-					keyboard = 'n';
-				break;
-			case KEY_O:
-				if (shiftkey)
-					keyboard = 'O';
-				else
-					keyboard = 'o';
-				break;
-			case KEY_P:
-				if (shiftkey)
-					keyboard = 'P';
-				else
-					keyboard = 'p';
-				break;
-			case KEY_Q:
-				if (shiftkey)
-					keyboard = 'Q';
-				else
-					keyboard = 'q';
-				break;
-			case KEY_R:
-				if (shiftkey)
-					keyboard = 'R';
-				else
-					keyboard = 'r';
-				break;
-			case KEY_S:
-				if (shiftkey)
-					keyboard = 'S';
-				else
-					keyboard = 's';
-				break;
-			case KEY_T:
-				if (shiftkey)
-					keyboard = 'T';
-				else
-					keyboard = 't';
-				break;
-			case KEY_U:
-				if (shiftkey)
-					keyboard = 'U';
-				else
-					keyboard = 'u';
-				break;
-			case KEY_V:
-				if (shiftkey)
-					keyboard = 'V';
-				else
-					keyboard = 'v';
-				break;
-			case KEY_W:
-				if (shiftkey)
-					keyboard = 'W';
-				else
-					keyboard = 'w';
-				break;
-			case KEY_X:
-				if (shiftkey)
-					keyboard = 'X';
-				else
-					keyboard = 'x';
-				break;
-			case KEY_Y:
-				if (shiftkey)
-					keyboard = 'Y';
-				else
-					keyboard = 'y';
-				break;
-			case KEY_Z:
-				if (shiftkey)
-					keyboard = 'Z';
-				else
-					keyboard = 'z';
-				break;
-			case KEY_0:
-				if (shiftkey)
-					keyboard = ')';
-				else
-					keyboard = '0';
-				break;
-			case KEY_1:
-				if (shiftkey)
-					keyboard = '!';
-				else
-					keyboard = '1';
-				break;
-			case KEY_2:
-				if (shiftkey)
-					keyboard = '@';
-				else
-					keyboard = '2';
-				break;
-			case KEY_3:
-				if (shiftkey)
-					keyboard = '#';
-				else
-					keyboard = '3';
-				break;
-			case KEY_4:
-				if (shiftkey)
-					keyboard = '$';
-				else
-					keyboard = '4';
-				break;
-			case KEY_5:
-				if (shiftkey)
-					keyboard = '%';
-				else
-					keyboard = '5';
-				break;
-			case KEY_6:
-				if (shiftkey)
-					keyboard = '^';
-				else
-					keyboard = '6';
-				break;
-			case KEY_7:
-				if (shiftkey)
-					keyboard = '&';
-				else
-					keyboard = '7';
-				break;
-			case KEY_8:
-				if (shiftkey)
-					keyboard = '*';
-				else
-					keyboard = '8';
-				break;
-			case KEY_9:
-				if (shiftkey)
-					keyboard = '(';
-				else
-					keyboard = '9';
-				break;
-			case KEY_SPACE:
-				keyboard = ' ';
-				break;
-			case KEY_BACKSPACE:
-				keyboard = KEYBOARD_BACKSPACE;
-				break;
-			case KEY_ENTER:
-				keyboard = KEYBOARD_ACTION;
-				break;
-			case KEY_SLASH:
-				if (shiftkey)
-					keyboard = '?';
-				else
-					keyboard = '/';
-				break;
-			case KEY_DOT:
-				if (shiftkey)
-					keyboard = '>';
-				else
-					keyboard = '.';
-				break;
-			case KEY_COMMA:
-				if (shiftkey)
-					keyboard = '<';
-				else
-					keyboard = ',';
-				break;
-			case KEY_MINUS:
-				if (shiftkey)
-					keyboard = '_';
-				else
-					keyboard = '-';
-				break;
-			case KEY_GRAVE:
-				if (shiftkey)
-					keyboard = '~';
-				else
-					keyboard = '`';
-				break;
-			case KEY_EQUAL:
-				if (shiftkey)
-					keyboard = '+';
-				else
-					keyboard = '=';
-				break;
-			case KEY_LEFTBRACE:
-				if (shiftkey)
-					keyboard = '{';
-				else
-					keyboard = '[';
-				break;
-			case KEY_RIGHTBRACE:
-				if (shiftkey)
-					keyboard = '}';
-				else
-					keyboard = ']';
-				break;
-			case KEY_BACKSLASH:
-				if (shiftkey)
-					keyboard = '|';
-				else
-					keyboard = '\\';
-				break;
-			case KEY_SEMICOLON:
-				if (shiftkey)
-					keyboard = ':';
-				else
-					keyboard = ';';
-				break;
-			case KEY_APOSTROPHE:
-				if (shiftkey)
-					keyboard = '\"';
-				else
-					keyboard = '\'';
-				break;
-#ifdef _EVENT_LOGGING
-			default:
-				LOGE("Unmapped keycode: %i\n", key);
-				break;
-#endif
-		}
-		if (keyboard == -1)
-			return 1;
-		PageManager::NotifyKeyboard(keyboard);
-		return 0;
-	}
+	if (!mKey || key != mKey)
+		return 1;
 
 	doActions();
 	return 0;
@@ -1108,18 +802,19 @@ int GUIAction::doAction(Action action, int isThreaded /* = 0 */)
 				} else {
 					// Below seen in Koush's recovery
 					char sddevice[256];
+					char mkdir_path[255];
 					Volume *vol = volume_for_path("/sdcard");
 					strcpy(sddevice, vol->device);
 					// Just need block not whole partition
 					sddevice[strlen("/dev/block/mmcblkX")] = NULL;
 
 					char es[64];
-					std::string ext_format;
+					std::string ext_format, sd_path;
 					int ext, swap;
 					DataManager::GetValue("tw_sdext_size", ext);
 					DataManager::GetValue("tw_swap_size", swap);
 					DataManager::GetValue("tw_sdpart_file_system", ext_format);
-					sprintf(es, "/sbin/sdparted -es %dM -ss %dM -efs %s -s > /cache/part.log",ext,swap,ext_format.c_str());
+					sprintf(es, "/sbin/sdparted -es %dM -ss %dM -efs ext3 -s > /cache/part.log",ext,swap);
 					LOGI("\nrunning script: %s\n", es);
 					run_script("\nContinue partitioning?",
 						   "\nPartitioning sdcard : ",
@@ -1130,12 +825,35 @@ int GUIAction::doAction(Action action, int isThreaded /* = 0 */)
 						   "\nPartitioning aborted!\n\n", 0);
 					
 					// recreate TWRP folder and rewrite settings - these will be gone after sdcard is partitioned
-					ensure_path_mounted(SDCARD_ROOT);
-					mkdir("/sdcard/TWRP", 0777);
+#ifdef TW_EXTERNAL_STORAGE_PATH
+					ensure_path_mounted(EXPAND(TW_EXTERNAL_STORAGE_PATH));
+					DataManager::GetValue(TW_EXTERNAL_PATH, sd_path);
+					memset(mkdir_path, 0, sizeof(mkdir_path));
+					sprintf(mkdir_path, "%s/TWRP", sd_path.c_str());
+#else
+					ensure_path_mounted("/sdcard");
+					strcpy(mkdir_path, "/sdcard/TWRP");
+#endif
+					mkdir(mkdir_path, 0777);
 					DataManager::Flush();
+#ifdef TW_EXTERNAL_STORAGE_PATH
+					DataManager::SetValue(TW_ZIP_EXTERNAL_VAR, EXPAND(TW_EXTERNAL_STORAGE_PATH));
+					if (DataManager::GetIntValue(TW_USE_EXTERNAL_STORAGE) == 1)
+						DataManager::SetValue(TW_ZIP_LOCATION_VAR, EXPAND(TW_EXTERNAL_STORAGE_PATH));
+#else
 					DataManager::SetValue(TW_ZIP_EXTERNAL_VAR, "/sdcard");
 					if (DataManager::GetIntValue(TW_USE_EXTERNAL_STORAGE) == 1)
 						DataManager::SetValue(TW_ZIP_LOCATION_VAR, "/sdcard");
+#endif
+					// This is sometimes needed to make a healthy ext4 partition
+					if (ext > 0 && strcmp(ext_format.c_str(), "ext4") == 0) {
+						char command[256];
+						sprintf(command, "mke2fs -t ext4 -m 0 %s", sde.blk);
+						ui_print("Formatting sd-ext as ext4...\n");
+						LOGI("Formatting sd-ext after partitioning, command: '%s'\n", command);
+						__system(command);
+						ui_print("DONE\n");
+					}
 
 					update_system_details();
 				}

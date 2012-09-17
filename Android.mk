@@ -123,6 +123,12 @@ endif
 ifeq ($(TW_HAS_DOWNLOAD_MODE), true)
     LOCAL_CFLAGS += -DTW_HAS_DOWNLOAD_MODE
 endif
+ifeq ($(TW_SDEXT_NO_EXT4), true)
+    LOCAL_CFLAGS += -DTW_SDEXT_NO_EXT4
+endif
+ifeq ($(TW_FORCE_CPUINFO_FOR_DEVICE_ID), true)
+    LOCAL_CFLAGS += -DTW_FORCE_CPUINFO_FOR_DEVICE_ID
+endif
 
 # This binary is in the recovery ramdisk, which is otherwise a copy of root.
 # It gets copied there in config/Makefile.  LOCAL_MODULE_TAGS suppresses
@@ -148,7 +154,15 @@ ifeq ($(TW_INCLUDE_CRYPTO), true)
     LOCAL_CFLAGS += -DCRYPTO_FS_FLAGS=\"$(TW_CRYPTO_FS_FLAGS)\"
     LOCAL_CFLAGS += -DCRYPTO_KEY_LOC=\"$(TW_CRYPTO_KEY_LOC)\"
     LOCAL_SHARED_LIBRARIES += libcrypto
-    LOCAL_SRC_FILES += cryptfs.c
+    LOCAL_SRC_FILES += crypto/ics/cryptfs.c
+    LOCAL_C_INCLUDES += system/extras/ext4_utils external/openssl/include
+endif
+ifeq ($(TW_INCLUDE_JB_CRYPTO), true)
+    LOCAL_CFLAGS += -DTW_INCLUDE_CRYPTO
+    LOCAL_CFLAGS += -DTW_INCLUDE_JB_CRYPTO
+    LOCAL_SHARED_LIBRARIES += libcrypto
+    LOCAL_STATIC_LIBRARIES += libfs_mgrtwrp
+    LOCAL_SRC_FILES += crypto/jb/cryptfs.c
     LOCAL_C_INCLUDES += system/extras/ext4_utils external/openssl/include
 endif
 
@@ -216,6 +230,10 @@ include $(commands_recovery_local_path)/htc-offmode-charge/Android.mk
 include $(commands_recovery_local_path)/pigz/Android.mk
 include $(commands_recovery_local_path)/cryptsettings/Android.mk
 include $(commands_recovery_local_path)/libcrecovery/Android.mk
+
+ifeq ($(TW_INCLUDE_JB_CRYPTO), true)
+    include $(commands_recovery_local_path)/crypto/fs_mgr/Android.mk
+endif
 
 commands_recovery_local_path :=
 

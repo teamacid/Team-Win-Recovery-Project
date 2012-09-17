@@ -752,9 +752,9 @@ int tw_backup(struct dInfo bMnt, const char *bDir)
 
     char str[512];
 	unsigned long long bPartSize;
-	char *bImage = malloc(sizeof(char)*255);
-	char *bMount = malloc(sizeof(char)*255);
-	char *bCommand = malloc(sizeof(char)*255);
+	char bImage[255];
+	char bMount[255];
+	char bCommand[255];
 	int breakup_archives = 0;
 
     if (bMnt.backup == files)
@@ -847,9 +847,6 @@ int tw_backup(struct dInfo bMnt, const char *bDir)
 		{
 			ui_print("E: File size is zero bytes. Aborting...\n\n"); // oh noes! file size is 0, abort! abort!
 			tw_unmount(bMnt);
-			free(bCommand);
-			free(bMount);
-			free(bImage);
 			return 1;
 		}
 
@@ -863,9 +860,6 @@ int tw_backup(struct dInfo bMnt, const char *bDir)
 			{
 				if (DataManager_GetIntValue(TW_IGNORE_IMAGE_SIZE) == 1) {
 					LOGE("File size is incorrect. Aborting.\n\n"); // they dont :(
-					free(bCommand);
-					free(bMount);
-					free(bImage);
 					return 1;
 				} else
 					LOGW("Image size doesn't match, ignoring error due to TW_IGNORE_IMAGE_SIZE setting.\n");
@@ -899,9 +893,6 @@ int tw_backup(struct dInfo bMnt, const char *bDir)
 			{
 				LOGE("File size is zero bytes. Aborting...\n\n"); // oh noes! file size is 0, abort! abort!
 				tw_unmount(bMnt);
-				free(bCommand);
-				free(bMount);
-				free(bImage);
 				return 1;
 			}
 			total_bsize += st.st_size;
@@ -916,9 +907,6 @@ int tw_backup(struct dInfo bMnt, const char *bDir)
 	if (strcmp(bMnt.mnt, ".android_secure") != 0) // any partition other than android secure,
 		tw_unmount(bMnt); // unmount partition we just restored to (if it's not a mountable partition, it will just bypass)
 
-    free(bCommand);
-	free(bMount);
-	free(bImage);
 	return 0;
 }
 
@@ -1376,15 +1364,26 @@ int tw_restore(struct dInfo rMnt, const char *rDir)
 	}
 	if(md5_result == 0)
 	{
-		strcpy(rFilenameW, rFilename);
-		strcat(rFilenameW, "*");
-		sprintf(rCommand,"ls -l %s | awk -F'.' '{ print $2 }'",rFilenameW); // let's get the filesystem type from filename
-        reFp = __popen(rCommand, "r");
 		LOGI("=> Filename is: %s\n",rMnt.fnm);
-		while (fscanf(reFp,"%s",rFilesystem) == 1) { // if we get a match, store filesystem type
-			LOGI("=> Filesystem is: %s\n",rFilesystem); // show it off to the world!
-		}
-		__pclose(reFp);
+
+		// Find the file system
+		{
+			char* tok = strtok(rMnt.fnm, ".");
+			if (tok) {
+				// First part is the partition name e.g. system, data, boot, etc. and we need the second part
+				tok = strtok(NULL, ".");
+				if (tok) {
+					strcpy(rFilesystem, tok);
+					LOGI("=> File system is '%s'\n", rFilesystem);
+				} else {
+					LOGE("Unable to determine file system for '%s'\n", rMnt.fnm);
+					return 1;
+				}
+			} else {
+				LOGE("Unable to determine file system for '%s'\n", rMnt.fnm);
+				return 1;
+			}
+		} // Finish finding file system
 
 		if (DataManager_GetIntValue(TW_HAS_DATA_MEDIA) == 1 && strcmp(rMnt.mnt,"data") == 0) {
 			wipe_data_without_wiping_media();
@@ -1413,6 +1412,7 @@ int tw_restore(struct dInfo rMnt, const char *rDir)
 		} else if (rMnt.backup == files) {
 			ui_print("...Formatting %s\n",rMnt.mnt);
             SetDataState("Formatting", rMnt.mnt, 0, 0);
+			tw_unmount(rMnt);
 			if (strcmp(rMnt.fst, "yaffs2") == 0) {
 				if (strcmp(rMnt.mnt, "data") == 0) {
 					tw_format(rFilesystem,"userdata"); // on MTD yaffs2, data is actually found under userdata
@@ -1422,6 +1422,7 @@ int tw_restore(struct dInfo rMnt, const char *rDir)
             } else {
 			    tw_format(rFilesystem,rMnt.blk); // let's format block, based on filesystem from filename above
             }
+			sleep(1);
 			ui_print("....done formatting.\n");
 		}
 

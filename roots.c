@@ -76,8 +76,10 @@ void load_volume_table() {
             device_volumes[num_volumes].mount_point = strdup(mount_point);
             device_volumes[num_volumes].fs_type = strdup(fs_type);
             device_volumes[num_volumes].device = strdup(device);
-            device_volumes[num_volumes].device2 =
-                device2 ? strdup(device2) : NULL;
+			if (device2 && *device2 == '/')
+				device_volumes[num_volumes].device2 = strdup(device2);
+			else
+				device_volumes[num_volumes].device2 = NULL;
             ++num_volumes;
         } else {
             LOGE("skipping malformed recovery.fstab line: %s\n", original);
@@ -176,6 +178,17 @@ int ensure_path_mounted(const char* path) {
 
     mkdir(v->mount_point, 0755);  // in case it doesn't already exist
 
+	// Check and update fs_type if needed
+	struct dInfo* loc = NULL;
+
+	loc = findDeviceByBlockDevice(v->device);
+	if (loc) {
+		if (strcmp(v->fs_type, loc->fst) != 0) {
+			LOGI("Changing file system '%s' on '%s' to '%s'.\n", v->fs_type, v->device, loc->fst);
+			v->fs_type = strdup(loc->fst);
+		}
+	}
+
     if (strcmp(v->fs_type, "yaffs2") == 0) {
         // mount an MTD partition as a YAFFS2 filesystem.
         mtd_scan_partitions();
@@ -204,7 +217,7 @@ int ensure_path_mounted(const char* path) {
             if (result == 0) return 0;
         }
 
-		if (strncmp(path, "/data", 5) == 0 && DataManager_GetIntValue(TW_IS_ENCRYPTED) == 1)
+		if ((strncmp(path, "/data", 5) == 0 && DataManager_GetIntValue(TW_IS_ENCRYPTED) == 1) || (DataManager_GetIntValue(TW_HAS_DUAL_STORAGE) == 1 && strcmp(path, DataManager_GetStrValue(TW_EXTERNAL_PATH)) ==0))
 			LOGI("failed to mount %s (%s)\n", v->mount_point, strerror(errno));
 		else
 			LOGE("failed to mount %s (%s)\n", v->mount_point, strerror(errno));
@@ -294,6 +307,17 @@ int format_volume(const char* volume) {
         LOGE("can't give path \"%s\" to format_volume, mount point is \"%s\"\n", volume, v->mount_point);
         return -1;
     }
+
+	// Check and update fs_type if needed
+	struct dInfo* loc = NULL;
+
+	loc = findDeviceByBlockDevice(v->device);
+	if (loc) {
+		if (strcmp(v->fs_type, loc->fst) != 0) {
+			LOGI("Changing file system '%s' on '%s' to '%s'.\n", v->fs_type, v->device, loc->fst);
+			v->fs_type = strdup(loc->fst);
+		}
+	}
 
     // Retrieve the fs_type
     const char* fs_type = v->fs_type;

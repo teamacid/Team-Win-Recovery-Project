@@ -27,8 +27,12 @@
 #include "backstore.h"
 #include "data.h"
 #ifdef TW_INCLUDE_CRYPTO
-#include "cryptfs.h"
-#include "cutils/properties.h"
+	#ifdef TW_INCLUDE_JB_CRYPTO
+		#include "crypto/jb/cryptfs.h"
+	#else
+		#include "crypto/ics/cryptfs.h"
+	#endif
+	#include "cutils/properties.h"
 #endif
 
 struct dInfo tmp, sys, dat, boo, rec, cac, sdcext, sdcint, ase, sde, sp1, sp2, sp3, datdat;
@@ -444,6 +448,9 @@ void updateMntUsedSize(struct dInfo* mMnt)
 			sprintf(external_mount_point, "/%s/.", DataManager_GetStrValue(TW_EXTERNAL_PATH));
 			if (strcmp(path, external_mount_point) == 0)
 				return; // This prevents an error from showing on devices that have internal and external storage, but there is no sdcard installed.
+			sprintf(external_mount_point, "%s/.", DataManager_GetStrValue(TW_EXTERNAL_PATH));
+			if (strcmp(path, external_mount_point) == 0)
+				return; // This prevents an error from showing on devices that have internal and external storage, but there is no sdcard installed.
 		}
 		LOGE("Unable to stat '%s'\n", path);
         return;
@@ -712,6 +719,7 @@ static void createFstabEntry(FILE* fp, struct dInfo* mnt)
 void verifyFst()
 {
 	FILE *fp;
+	char blkCommand[255];
 	char blkOutput[255];
 	char* blk;
     char* arg;
@@ -719,10 +727,18 @@ void verifyFst()
     struct dInfo* dat;
 
     // This has a tendency to hang on MTD devices.
-    if (isMTDdevice)    return;
+    if (isMTDdevice) {
+		struct statfs st;
 
-	LOGI("=> Let's update filesystem types via verifyFst aka blkid.\n");
-	fp = __popen("blkid","r");
+		if (statfs(sde.blk, &st) != 0)
+			return; // No sd-ext present
+
+		sprintf(blkCommand, "blkid %s", sde.blk);
+	} else
+		strcpy(blkCommand, "blkid");
+
+	LOGI("=> Let's update filesystem types via verifyFst aka blkid, command: '%s'.\n", blkCommand);
+	fp = __popen(blkCommand,"r");
 	while (fgets(blkOutput, sizeof(blkOutput), fp) != NULL)
     {
         blk = blkOutput;
@@ -864,12 +880,16 @@ int decrypt_device(void)
 
 	strcpy(password, DataManager_GetStrValue(TW_CRYPTO_PASSWORD));
 	property_set("ro.crypto.state", "encrypted");
+#ifdef TW_INCLUDE_JB_CRYPTO
+	// No extra flags needed
+#else
 	property_set("ro.crypto.fs_type", CRYPTO_FS_TYPE);
 	property_set("ro.crypto.fs_real_blkdev", CRYPTO_REAL_BLKDEV);
 	property_set("ro.crypto.fs_mnt_point", CRYPTO_MNT_POINT);
 	property_set("ro.crypto.fs_options", CRYPTO_FS_OPTIONS);
 	property_set("ro.crypto.fs_flags", CRYPTO_FS_FLAGS);
 	property_set("ro.crypto.keyfile.userdata", CRYPTO_KEY_LOC);
+#endif
 	if (cryptfs_check_passwd(password) != 0) {
 		LOGE("Failed to decrypt data\n");
 		return -1;

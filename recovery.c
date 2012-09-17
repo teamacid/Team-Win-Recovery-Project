@@ -633,14 +633,14 @@ wipe_data(int confirm) {
 	struct stat st;
 	char ase_path[255];
 
-	strcpy(ase_path, DataManager_GetSettingsStoragePath());
-	strcat(ase_path, "/.android_secure");
-	ensure_path_mounted("/sd-ext");
 	if (stat(sde.blk,&st) == 0) {
 		ui_print("Formatting /sd-ext...\n");
+		tw_unmount(sde);
 		tw_format(sde.fst,sde.blk);
 	}
 	mount_internal_storage();
+	strcpy(ase_path, DataManager_GetSettingsStoragePath());
+	strcat(ase_path, "/.android_secure");
 	if (stat(ase_path, &st) == 0) {
 		char command[255];
 		ui_print("Formatting android_secure...\n");
@@ -1090,7 +1090,11 @@ main(int argc, char **argv) {
     // If these fail, there's not really anywhere to complain...
     freopen(TEMPORARY_LOG_FILE, "a", stdout); setbuf(stdout, NULL);
     freopen(TEMPORARY_LOG_FILE, "a", stderr); setbuf(stderr, NULL);
-    printf("Starting recovery on %s", ctime(&start));
+    printf("Starting TWRP %s on %s", EXPAND(TW_VERSION_STR), ctime(&start));
+
+    // Recovery needs to install world-readable files, so clear umask
+    // set by init
+    umask(0);
 
     printf("Loading volume table...\n");
     load_volume_table();
